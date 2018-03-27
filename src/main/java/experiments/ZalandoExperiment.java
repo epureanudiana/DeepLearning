@@ -48,8 +48,12 @@ public class ZalandoExperiment extends Experiment {
     // read input and print some information on the data
     InputReader reader = MNISTReader.fashion(batchSize); 
     System.out.println("Reader info:\n" + reader.toString());
-    int inputs = reader.getInputShape().getNeuronCount();
+    TensorShape inputs = reader.getInputShape();
+    System.out.println(reader.getInputShape());
+    System.out.println(inputs);
     int outputs = reader.getOutputShape().getNeuronCount();
+    System.out.println(reader.getOutputShape());
+    System.out.println(outputs);
     //print one record
     reader.getValidationData(1).forEach(System.out:: println);
     Model m = createModel(inputs, outputs);
@@ -64,12 +68,14 @@ public class ZalandoExperiment extends Experiment {
     trainModel(m, reader, sgd, epochs, 0);
     }
     
-    Model createModel ( int inputs , int outputs ) {
-    Model model = new Model(new InputLayer("In", new TensorShape(inputs), true)); 
+    Model createModel ( TensorShape inputs , int outputs ) {
+    Model model = new Model(new InputLayer("In",inputs, true)); 
     
     // add flatten layer after input layer
-    model.addLayer(new Flatten ("Flatten", new TensorShape(16)));
-    model.addLayer(new OutputSoftmax("Out",new TensorShape(16), 1, new CrossEntropy()));
+    model.addLayer(new Flatten ("Flatten", inputs));
+    model.addLayer(new OutputSoftmax("Out", new TensorShape(inputs.
+            getNeuronCount()), outputs, new CrossEntropy()));
+    
    
     //System.out.println(model); 
     return model ;
