@@ -17,22 +17,23 @@ import org.nd4j.linalg.factory.Nd4j;
  */
 public class GradientDescentWithMomentum implements UpdateFunction {
     
-  Optimizer sgd = SGD.builder().
-          updateFunction(GradientDescentWithMomentum ::new).build() ;
-    
-    INDArray velocity = Nd4j.zeros(28,28,1);
-    double mu = 0.9; 
-// coefficient of friction
+    INDArray update;
+    double mu = 0.7; 
+
     @Override
-    /* Does a gradient descent step with factor ’minus learningRate’ and corrected for batchSize. */
     public void update(INDArray array, boolean isBias, float learningRate, 
             int batchSize, INDArray gradient) {
+    if (update == null) {
+       update = array.dup('f').assign(0);
+    }    
+    //Nd4j.getBlasWrapper().level1().axpy( value.length(), factor, gradient, value );
+    // value <-- value + factor * gradient
+ 
+    update.muli(mu);
+    Nd4j.getBlasWrapper().level1().axpy(update.length(), -learningRate, gradient, update);  
+    Nd4j.getBlasWrapper().level1().axpy(array.length(), 1, update, array);
+      // array <-- array + 1*velocity
         
-       float factor = (learningRate/batchSize ) ;
-       Nd4j.getBlasWrapper().level1().axpy( array.length(), factor, gradient, array );
-       gradient.assign(0); // array <   array + factor * gradient
        
-       velocity = velocity.mul(mu).sub(gradient.mul(learningRate));
-       array.addi(velocity);
     }
 }

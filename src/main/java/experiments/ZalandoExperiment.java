@@ -37,7 +37,7 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
 public class ZalandoExperiment extends Experiment {
      // ( hyper ) parameters
     int batchSize = 20;
-    int epochs = 10;
+    int epochs = 5;
     float learningRate = 0.001f;
     String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
     "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
@@ -73,10 +73,14 @@ public class ZalandoExperiment extends Experiment {
     FXGUI.getSingleton().addTab("show case", showCase.getNode()); 
     showCase.setItems(reader.getValidationData(100));
     
-    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
-        .validator(new Classification()).build();
+//    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
+//        .validator(new Classification()).build();
+    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate).
+            validator(new Classification()).
+            updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
+    
     
     Model createModel ( TensorShape inputs , int outputs ) {
     Model model = new Model(new InputLayer("In",inputs, true)); 
