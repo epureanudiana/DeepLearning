@@ -9,6 +9,7 @@ import java.util.List;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.activation.Activation;
 import nl.tue.s2id90.dl.NN.activation.RELU;
+import nl.tue.s2id90.dl.NN.activation.Sigmoid;
 import nl.tue.s2id90.dl.NN.activation.Softmax;
 import nl.tue.s2id90.dl.NN.initializer.Gaussian;
 import nl.tue.s2id90.dl.NN.layer.Convolution2D;
