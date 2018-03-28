@@ -7,12 +7,17 @@ package experiments;
 import java.io.IOException;
 import java.util.List;
 import nl.tue.s2id90.dl.NN.Model;
+import nl.tue.s2id90.dl.NN.activation.Activation;
 import nl.tue.s2id90.dl.NN.activation.RELU;
+import nl.tue.s2id90.dl.NN.activation.Softmax;
 import nl.tue.s2id90.dl.NN.initializer.Gaussian;
+import nl.tue.s2id90.dl.NN.layer.Convolution2D;
 import nl.tue.s2id90.dl.NN.layer.Flatten;
 import nl.tue.s2id90.dl.NN.layer.FullyConnected;
 import nl.tue.s2id90.dl.NN.layer.InputLayer;
+import nl.tue.s2id90.dl.NN.layer.Layer;
 import nl.tue.s2id90.dl.NN.layer.OutputSoftmax;
+import nl.tue.s2id90.dl.NN.layer.PoolMax2D;
 import nl.tue.s2id90.dl.NN.layer.SimpleOutput;
 import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.loss.MSE;
@@ -91,12 +96,34 @@ public class ZalandoExperiment extends Experiment {
     
     
     Model createModel ( TensorShape inputs , int outputs ) {
-    Model model = new Model(new InputLayer("In",inputs, true)); 
+        
+    int kernelSize = 1;
+    int noFilters = 1;
+    Activation activation = new RELU();
+
+    InputLayer iLayer = new InputLayer("In",inputs, true);
+    Model model = new Model(iLayer);
     
+    Layer convolutional =new Convolution2D("Convolution", iLayer.getOutputShape(), kernelSize,
+            noFilters, activation);    
+    model.addLayer(convolutional);
+    
+    
+    Layer pool = new PoolMax2D("Pool", convolutional.getOutputShape(), 1);
+    model.addLayer(pool);
+    
+
     // add flatten layer after input layer
-    model.addLayer(new Flatten ("Flatten", inputs));
-    model.addLayer(new OutputSoftmax("Out", new TensorShape(inputs.
-            getNeuronCount()), outputs, new CrossEntropy()));
+    Layer flatter = new Flatten ("Flatten", pool.getOutputShape());
+    model.addLayer(flatter);
+    
+    Layer output = new OutputSoftmax("Out", flatter.getOutputShape(), outputs, new CrossEntropy());
+    
+    System.out.format("conv: %s and pool: %s  and flatter: %s and output: %s \n", convolutional.getOutputShape(), 
+            pool.getOutputShape(), flatter.getOutputShape(), output.getOutputShape() );
+    //new TensorShape(inputs.getNeuronCount()) //original input count
+    
+    model.addLayer(output);
     
    
     //System.out.println(model); 
