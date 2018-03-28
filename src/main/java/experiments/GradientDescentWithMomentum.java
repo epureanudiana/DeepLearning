@@ -18,11 +18,13 @@ import org.nd4j.linalg.factory.Nd4j;
 public class GradientDescentWithMomentum implements UpdateFunction {
     
     INDArray update;
-    double mu = 0.7; 
+    private double mu = 0.5; 
 
     @Override
     public void update(INDArray array, boolean isBias, float learningRate, 
             int batchSize, INDArray gradient) {
+        
+   
     if (update == null) {
        update = array.dup('f').assign(0);
     }    
@@ -33,7 +35,14 @@ public class GradientDescentWithMomentum implements UpdateFunction {
     Nd4j.getBlasWrapper().level1().axpy(update.length(), -learningRate, gradient, update);  
     Nd4j.getBlasWrapper().level1().axpy(array.length(), 1, update, array);
       // array <-- array + 1*velocity
-        
-       
+   
     }
+    
+    public double getMu(){
+        return this.mu;
+    }
+    public void setMu(double newMu){
+        this.mu = newMu; 
+    }
+    
 }

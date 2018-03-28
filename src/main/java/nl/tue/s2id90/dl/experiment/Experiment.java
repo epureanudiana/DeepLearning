@@ -1,5 +1,6 @@
 package nl.tue.s2id90.dl.experiment;
 
+import experiments.GradientDescentWithMomentum;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -26,6 +27,8 @@ public class Experiment {
     private GraphPanel validationGraph;
     private Activations activations;
     private BatchResult lastValidationResult;
+    
+    GradientDescentWithMomentum gd = new GradientDescentWithMomentum();
  
     public Experiment() {
         this(false);    // don't startup GUI
@@ -97,6 +100,7 @@ public class Experiment {
             }
             
             onEpochFinished(model, reader, sgd, epochs, activations, epoch);
+           
         }
         
         System.out.format( "Training of model finished after %d epochs.\n.", epochs );
@@ -140,10 +144,19 @@ public class Experiment {
      */
     public void onEpochFinished(Model model, InputReader reader, Optimizer sgd, int epochs, int activations, int epoch) {
         // validate model after each epoch
+        
+        
+        double mu = gd.getMu();
+        double inc = (double)0.49/(double)epochs;
+        double newMu = mu + inc;
+        gd.setMu(newMu );
+        
+        
         System.out.println("\nValidating ...");
         model.setInTrainingMode(false);
         lastValidationResult = sgd.validate(reader.getValidationData());
-        System.out.format("Validation after epoch %3d: %s \n", epoch, lastValidationResult);
+        System.out.format("Validation after epoch %3d: %s and %s \n", epoch, lastValidationResult, newMu);
+ 
 
         // add to gui
         addValidationResult(lastValidationResult);

@@ -27,6 +27,7 @@ import nl.tue.s2id90.dl.experiment.Experiment;
 import nl.tue.s2id90.dl.input.GenerateFunctionData;
 import nl.tue.s2id90.dl.input.InputReader;
 import nl.tue.s2id90.dl.input.MNISTReader;
+import nl.tue.s2id90.dl.input.PrimitivesDataGenerator;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 import nl.tue.s2id90.dl.javafx.ShowCase;
 
@@ -41,7 +42,7 @@ public class ZalandoExperiment extends Experiment {
     float learningRate = 0.001f;
     String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
     "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
-   
+   //String [] labels= {"Square" ,"Circle" ,"Triangle" };
 
     
     ZalandoExperiment(){ 
@@ -51,11 +52,18 @@ public class ZalandoExperiment extends Experiment {
     public void go() throws IOException {
     // you are going to add code here.
     // read input and print some information on the data
+    
     InputReader reader = MNISTReader.fashion(batchSize); 
+//    int seed = 11081961 , trainingDataSize =1500 , testDataSize =200;
+//    InputReader reader = new PrimitivesDataGenerator( batchSize ,
+//    seed , trainingDataSize , testDataSize ) ;
+    
+    
     System.out.println("Reader info:\n" + reader.toString());
     TensorShape inputs = reader.getInputShape();
     int outputs = reader.getOutputShape().getNeuronCount();
     
+    //////////////////////////////////////////////
     List<TensorPair> myTrainingData = reader.getTrainingData();
     List<TensorPair> myValidationData = reader.getValidationData();
     
@@ -63,7 +71,7 @@ public class ZalandoExperiment extends Experiment {
     dt.fit(myTrainingData);
     dt.transform(myTrainingData);
     dt.transform (myValidationData) ;
-    
+    ///////////////////////////////////////////////////
     //print one record
     reader.getValidationData(1).forEach(System.out:: println);
     Model m = createModel(inputs, outputs);
