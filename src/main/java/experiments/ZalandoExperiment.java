@@ -5,6 +5,7 @@
  */
 package experiments;
 import java.io.IOException;
+import java.util.List;
 import nl.tue.s2id90.dl.NN.Model;
 import nl.tue.s2id90.dl.NN.activation.RELU;
 import nl.tue.s2id90.dl.NN.initializer.Gaussian;
@@ -17,7 +18,9 @@ import nl.tue.s2id90.dl.NN.loss.CrossEntropy;
 import nl.tue.s2id90.dl.NN.loss.MSE;
 import nl.tue.s2id90.dl.NN.optimizer.Optimizer;
 import nl.tue.s2id90.dl.NN.optimizer.SGD;
+import nl.tue.s2id90.dl.NN.tensor.TensorPair;
 import nl.tue.s2id90.dl.NN.tensor.TensorShape;
+import nl.tue.s2id90.dl.NN.transform.DataTransform;
 import nl.tue.s2id90.dl.NN.validate.Classification;
 import nl.tue.s2id90.dl.NN.validate.Regression;
 import nl.tue.s2id90.dl.experiment.Experiment;
@@ -33,11 +36,13 @@ import nl.tue.s2id90.dl.javafx.ShowCase;
  */
 public class ZalandoExperiment extends Experiment {
      // ( hyper ) parameters
-    int batchSize = 32;
-    int epochs = 5;
-    float learningRate = 0.01f;
+    int batchSize = 20;
+    int epochs = 10;
+    float learningRate = 0.001f;
     String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
     "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
+   
+
     
     ZalandoExperiment(){ 
         super(true) ; 
@@ -49,11 +54,16 @@ public class ZalandoExperiment extends Experiment {
     InputReader reader = MNISTReader.fashion(batchSize); 
     System.out.println("Reader info:\n" + reader.toString());
     TensorShape inputs = reader.getInputShape();
-    System.out.println(reader.getInputShape());
-    System.out.println(inputs);
     int outputs = reader.getOutputShape().getNeuronCount();
-    System.out.println(reader.getOutputShape());
-    System.out.println(outputs);
+    
+    List<TensorPair> myTrainingData = reader.getTrainingData();
+    List<TensorPair> myValidationData = reader.getValidationData();
+    
+    DataTransform dt = new MeanSubtraction();
+    dt.fit(myTrainingData);
+    dt.transform(myTrainingData);
+    dt.transform (myValidationData) ;
+    
     //print one record
     reader.getValidationData(1).forEach(System.out:: println);
     Model m = createModel(inputs, outputs);
