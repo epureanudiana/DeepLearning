@@ -18,8 +18,7 @@ public class L2Decay implements UpdateFunction {
     
     INDArray update;
     int currentEpoch;
-    private float alpha; //=? current learning rate
-   // private float decayRate;
+    private float alpha;
     UpdateFunction f ;
     
     public L2Decay ( Supplier <UpdateFunction> supplier , float aplha ) {
@@ -29,10 +28,17 @@ public class L2Decay implements UpdateFunction {
     
     @Override
     public void update(INDArray array, boolean isBias, float learningRate, int batchSize, INDArray gradient) {
-        //update.muli(mu);
-        //float newLR = 1/ (1+ decayRate * epoch);
-        //Nd4j.getBlasWrapper().level1().axpy(update.length(), -learningRate, gradient, update);  
-        //Nd4j.getBlasWrapper().level1().axpy(array.length(), 1, update, array);
+        
+        f.update(array, isBias, learningRate, batchSize, gradient);
+        if (isBias){
+            return;
+        } else{
+            
+         Nd4j.getBlasWrapper().level1().axpy(array.length(), -alpha, array, array);
+         
+        }
+        
+        
     }
     
     
@@ -43,8 +49,8 @@ public class L2Decay implements UpdateFunction {
         this.alpha = newAlpha; 
     }
     
-    public void setEpoch(float newAlpha){
-        this.alpha = newAlpha; 
+    public void setEpoch(int e){
+        this.currentEpoch = e; 
     }
 }
 
