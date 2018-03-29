@@ -36,6 +36,7 @@ import nl.tue.s2id90.dl.input.MNISTReader;
 import nl.tue.s2id90.dl.input.PrimitivesDataGenerator;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 import nl.tue.s2id90.dl.javafx.ShowCase;
+import experiments.GradientDescentWithMomentum;
 
 /**
  *
@@ -89,9 +90,12 @@ public class ZalandoExperiment extends Experiment {
     
 //    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
 //        .validator(new Classification()).build();
-    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate).
-            validator(new Classification()).
-            updateFunction(GradientDescentWithMomentum ::new).build() ;
+    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
+            .validator(new Classification())
+            .updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+            .build(); 
+            
+            //.updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
     
