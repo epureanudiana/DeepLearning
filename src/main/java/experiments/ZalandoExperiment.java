@@ -92,14 +92,15 @@ public class ZalandoExperiment extends Experiment {
 //        .validator(new Classification()).build();
 //    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
 //            .validator(new Classification())
-//            .updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+//           .updateFunction(() -> new MyAdaDelta(() ->
+//            new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
 //            .build();
-
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
-            .updateFunction(() -> new L2Decay(MyAdaDelta::new, 0.001f))
-            .build(); 
-            
+            //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+            .updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
+            .build();
+    
     //.updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
@@ -110,28 +111,42 @@ public class ZalandoExperiment extends Experiment {
     int kernelSize = 1;
     int noFilters = 1;
     Activation activation = new RELU();
-
+   //input
     InputLayer iLayer = new InputLayer("In",inputs, true);
     Model model = new Model(iLayer);
-    
+    //2d
     Layer convolutional =new Convolution2D("Convolution", iLayer.getOutputShape(), kernelSize,
             noFilters, activation);    
     model.addLayer(convolutional);
     
-    
+    //pooling
     Layer pool = new PoolMax2D("Pool", convolutional.getOutputShape(), 1);
     model.addLayer(pool);
+    //2d
+    Layer convolutional2 =new Convolution2D("Convolution", pool.getOutputShape(), kernelSize,
+            noFilters, activation);    
+    model.addLayer(convolutional2);
     
-
+    //pool
+    Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
+    model.addLayer(pool2);
     // add flatten layer after input layer
-    Layer flatter = new Flatten ("Flatten", pool.getOutputShape());
+    Layer flatter = new Flatten ("Flatten", pool2.getOutputShape());
     model.addLayer(flatter);
     
+    //fully
+//    Layer fully = new FullyConnected("fc1", pool2.getOutputShape(), 
+//            inputs.getNeuronCount(), new RELU());
+//    model.addLayer(fully);
+    //fully2
+//    Layer fully2 = new FullyConnected("fc1", fully.getOutputShape(), inputs.getNeuronCount(), new RELU());
+//    model.addLayer(fully2);
+    
+    //output
     Layer output = new OutputSoftmax("Out", flatter.getOutputShape(), outputs, new CrossEntropy());
     
     System.out.format("conv: %s and pool: %s  and flatter: %s and output: %s \n", convolutional.getOutputShape(), 
             pool.getOutputShape(), flatter.getOutputShape(), output.getOutputShape() );
-    //new TensorShape(inputs.getNeuronCount()) //original input count
     
     model.addLayer(output);
     
