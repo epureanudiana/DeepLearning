@@ -42,28 +42,22 @@ import experiments.GradientDescentWithMomentum;
  *
  * @author dianaepureanu
  */
-public class ZalandoExperiment extends Experiment {
+public class SCTExperiment extends Experiment {
      // ( hyper ) parameters
-    int batchSize = 20;
-    int epochs = 5;
-    float learningRate = 0.001f;
-    String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
-    "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
-   //String [] labels= {"Square" ,"Circle" ,"Triangle" };
+    int batchSize = 100;
+    int epochs = 30;
+    float learningRate = 0.006f;
+    String [] labels= {"Square" ,"Circle" ,"Triangle" };
 
-    
-    ZalandoExperiment(){ 
+    SCTExperiment(){ 
         super(true) ; 
     }
 
     public void go() throws IOException {
-    // you are going to add code here.
-    // read input and print some information on the data
     
-    InputReader reader = MNISTReader.fashion(batchSize); 
-//    int seed = 11081961 , trainingDataSize =1500 , testDataSize =200;
-//    InputReader reader = new PrimitivesDataGenerator( batchSize ,
-//    seed , trainingDataSize , testDataSize ) ;
+    int seed = 11081961 , trainingDataSize = 1500 , testDataSize = 200;
+    InputReader reader = new PrimitivesDataGenerator( batchSize ,
+    seed , trainingDataSize , testDataSize ) ;
     
     
     System.out.println("Reader info:\n" + reader.toString());
@@ -97,7 +91,7 @@ public class ZalandoExperiment extends Experiment {
 //            .build();
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
-            //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+            .updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.01f))
             .updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
             .build();
     
@@ -130,8 +124,6 @@ public class ZalandoExperiment extends Experiment {
     //pool
     Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
     model.addLayer(pool2);
-    
-    
     // add flatten layer after input layer
     Layer flatter = new Flatten ("Flatten", pool2.getOutputShape());
     model.addLayer(flatter);
@@ -158,6 +150,6 @@ public class ZalandoExperiment extends Experiment {
 }
     
     public static void main(String[] args) throws IOException {
-        new ZalandoExperiment().go();
+        new SCTExperiment().go();
    }
 }

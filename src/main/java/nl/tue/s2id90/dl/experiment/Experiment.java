@@ -148,6 +148,8 @@ public class Experiment {
         
         double mu = gd.getMu();
         double inc = (double)0.49/(double)epochs;
+       // double inc = (double)0.35/(double)epochs;
+        //double inc = 0;
         double newMu = mu + inc;
         gd.setMu(newMu );
         

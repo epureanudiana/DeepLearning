@@ -37,40 +37,36 @@ import nl.tue.s2id90.dl.input.PrimitivesDataGenerator;
 import nl.tue.s2id90.dl.javafx.FXGUI;
 import nl.tue.s2id90.dl.javafx.ShowCase;
 import experiments.GradientDescentWithMomentum;
+import nl.tue.s2id90.dl.input.Cifar10Reader;
 
 /**
  *
  * @author dianaepureanu
  */
-public class ZalandoExperiment extends Experiment {
+public class Cifar10Experiment extends Experiment {
      // ( hyper ) parameters
-    int batchSize = 20;
+    int batchSize = 50;
     int epochs = 5;
-    float learningRate = 0.001f;
-    String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
-    "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
-   //String [] labels= {"Square" ,"Circle" ,"Triangle" };
+    float learningRate = 0.0001f;
+    String [] labels= {"airplane" ,"automobile" ,"bird" ,"cat" ,"deer" ,
+    "dog" ,"frog" ,"horse" ,"ship" ,"truck" };
 
     
-    ZalandoExperiment(){ 
+    Cifar10Experiment(){ 
         super(true) ; 
     }
 
     public void go() throws IOException {
-    // you are going to add code here.
-    // read input and print some information on the data
     
-    InputReader reader = MNISTReader.fashion(batchSize); 
-//    int seed = 11081961 , trainingDataSize =1500 , testDataSize =200;
-//    InputReader reader = new PrimitivesDataGenerator( batchSize ,
-//    seed , trainingDataSize , testDataSize ) ;
     
+    Cifar10Reader reader =new Cifar10Reader( batchSize , 10) ;
+
     
     System.out.println("Reader info:\n" + reader.toString());
     TensorShape inputs = reader.getInputShape();
     int outputs = reader.getOutputShape().getNeuronCount();
     
-    //////////////////////////////////////////////
+    ////////////////// PREPROCESSING //////////////////////////// 
     List<TensorPair> myTrainingData = reader.getTrainingData();
     List<TensorPair> myValidationData = reader.getValidationData();
     
@@ -98,10 +94,12 @@ public class ZalandoExperiment extends Experiment {
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
             //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
-            .updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
+            //.updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
+            .updateFunction(() -> new MyAdaDelta(() ->
+                    new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
             .build();
     
-    //.updateFunction(GradientDescentWithMomentum ::new).build() ;
+            //.updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
     
@@ -123,41 +121,37 @@ public class ZalandoExperiment extends Experiment {
     Layer pool = new PoolMax2D("Pool", convolutional.getOutputShape(), 1);
     model.addLayer(pool);
     //2d
-    Layer convolutional2 =new Convolution2D("Convolution", pool.getOutputShape(), kernelSize,
-            noFilters, activation);    
-    model.addLayer(convolutional2);
-    
-    //pool
-    Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
-    model.addLayer(pool2);
-    
-    
+//    Layer convolutional2 =new Convolution2D("Convolution", pool.getOutputShape(), kernelSize,
+//            noFilters, activation);    
+//    model.addLayer(convolutional2);
+//    
+//    //pool
+//    Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
+//    model.addLayer(pool2);
     // add flatten layer after input layer
-    Layer flatter = new Flatten ("Flatten", pool2.getOutputShape());
+    Layer flatter = new Flatten ("Flatten", pool.getOutputShape());
     model.addLayer(flatter);
     
     //fully
-//    Layer fully = new FullyConnected("fc1", pool2.getOutputShape(), 
-//            inputs.getNeuronCount(), new RELU());
-//    model.addLayer(fully);
+    Layer fully = new FullyConnected("fc1", flatter.getOutputShape(), 
+           inputs.getNeuronCount(), new RELU());
+    model.addLayer(fully);
     //fully2
 //    Layer fully2 = new FullyConnected("fc1", fully.getOutputShape(), inputs.getNeuronCount(), new RELU());
 //    model.addLayer(fully2);
     
     //output
-    Layer output = new OutputSoftmax("Out", flatter.getOutputShape(), outputs, new CrossEntropy());
+    Layer output = new OutputSoftmax("Out", fully.getOutputShape(), outputs, new CrossEntropy());
     
     System.out.format("conv: %s and pool: %s  and flatter: %s and output: %s \n", convolutional.getOutputShape(), 
             pool.getOutputShape(), flatter.getOutputShape(), output.getOutputShape() );
     
     model.addLayer(output);
-    
-   
-    //System.out.println(model); 
+
     return model ;
 }
     
     public static void main(String[] args) throws IOException {
-        new ZalandoExperiment().go();
+        new Cifar10Experiment().go();
    }
 }
