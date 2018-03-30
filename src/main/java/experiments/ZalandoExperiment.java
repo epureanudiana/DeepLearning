@@ -90,12 +90,17 @@ public class ZalandoExperiment extends Experiment {
     
 //    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
 //        .validator(new Classification()).build();
+//    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
+//            .validator(new Classification())
+//            .updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+//            .build();
+
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
-            .updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+            .updateFunction(() -> new L2Decay(MyAdaDelta::new, 0.001f))
             .build(); 
             
-            //.updateFunction(GradientDescentWithMomentum ::new).build() ;
+    //.updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
     
