@@ -115,7 +115,7 @@ public class ZalandoExperiment extends Experiment {
     InputLayer iLayer = new InputLayer("In",inputs, true);
     Model model = new Model(iLayer);
     //2d
-    Layer convolutional =new Convolution2D("Convolution", iLayer.getOutputShape(), kernelSize,
+    Layer convolutional = new Convolution2D("Convolution", iLayer.getOutputShape(), kernelSize,
             noFilters, activation);    
     model.addLayer(convolutional);
     
