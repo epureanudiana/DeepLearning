@@ -88,20 +88,11 @@ public class ZalandoExperiment extends Experiment {
     FXGUI.getSingleton().addTab("show case", showCase.getNode()); 
     showCase.setItems(reader.getValidationData(100));
     
-//    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
-//        .validator(new Classification()).build();
-//    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
-//            .validator(new Classification())
-//           .updateFunction(() -> new MyAdaDelta(() ->
-//            new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
-//            .build();
+
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
-            //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
             .updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
             .build();
-    
-    //.updateFunction(GradientDescentWithMomentum ::new).build() ;
     trainModel(m, reader, sgd, epochs, 0);
     }
     
