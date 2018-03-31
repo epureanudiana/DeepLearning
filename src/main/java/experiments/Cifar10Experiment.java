@@ -91,12 +91,17 @@ public class Cifar10Experiment extends Experiment {
 //           .updateFunction(() -> new MyAdaDelta(() ->
 //            new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
 //            .build();
+//    Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
+//            .validator(new Classification())
+//            //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
+//            //.updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
+//            .updateFunction(() -> new MyAdaDelta(() ->
+//                    new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
+//            .build();
     Optimizer sgd = SGD.builder().model(m).learningRate(learningRate)
             .validator(new Classification())
             //.updateFunction(() -> new L2Decay(GradientDescentWithMomentum ::new, 0.0001f))
-            //.updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
-            .updateFunction(() -> new MyAdaDelta(() ->
-                    new L2Decay(GradientDescentWithMomentum ::new, 0.0001f)))
+            .updateFunction(() -> new MyAdaDelta(GradientDescentWithMomentum ::new))
             .build();
     
             //.updateFunction(GradientDescentWithMomentum ::new).build() ;
