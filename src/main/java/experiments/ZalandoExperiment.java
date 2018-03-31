@@ -44,9 +44,9 @@ import experiments.GradientDescentWithMomentum;
  */
 public class ZalandoExperiment extends Experiment {
      // ( hyper ) parameters
-    int batchSize = 20;
+    int batchSize = 40;
     int epochs = 5;
-    float learningRate = 0.001f;
+    float learningRate = 0.0005f;
     String [] labels= {"T shirt/top" ,"Trouser" ,"Pullover" ,"Dress" ,"Coat" ,
     "Sandal" ,"Shirt" ,"Sneaker" ,"Bag" ,"Ankle boot" };
    //String [] labels= {"Square" ,"Circle" ,"Triangle" };
@@ -114,17 +114,17 @@ public class ZalandoExperiment extends Experiment {
     Layer pool = new PoolMax2D("Pool", convolutional.getOutputShape(), 1);
     model.addLayer(pool);
     //2d
-    Layer convolutional2 =new Convolution2D("Convolution", pool.getOutputShape(), kernelSize,
-            noFilters, activation);    
-    model.addLayer(convolutional2);
-    
-    //pool
-    Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
-    model.addLayer(pool2);
-    
+//    Layer convolutional2 =new Convolution2D("Convolution", pool.getOutputShape(), kernelSize,
+//            noFilters, activation);    
+//    model.addLayer(convolutional2);
+//    
+//    //pool
+//    Layer pool2 = new PoolMax2D("Pool", convolutional2.getOutputShape(), 1);
+//    model.addLayer(pool2);
+//    
     
     // add flatten layer after input layer
-    Layer flatter = new Flatten ("Flatten", pool2.getOutputShape());
+    Layer flatter = new Flatten ("Flatten", pool.getOutputShape());
     model.addLayer(flatter);
     
     //fully
