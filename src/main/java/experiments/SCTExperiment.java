@@ -44,9 +44,9 @@ import experiments.GradientDescentWithMomentum;
  */
 public class SCTExperiment extends Experiment {
      // ( hyper ) parameters
-    int batchSize = 100;
+    int batchSize = 250;
     int epochs = 30;
-    float learningRate = 0.006f;
+    float learningRate = 0.05f;
     String [] labels= {"Square" ,"Circle" ,"Triangle" };
 
     SCTExperiment(){ 
@@ -127,6 +127,9 @@ public class SCTExperiment extends Experiment {
     // add flatten layer after input layer
     Layer flatter = new Flatten ("Flatten", pool2.getOutputShape());
     model.addLayer(flatter);
+    
+    
+
     
     //fully
 //    Layer fully = new FullyConnected("fc1", pool2.getOutputShape(), 
